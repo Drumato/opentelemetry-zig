@@ -1,16 +1,21 @@
 const resource = @import("resource.zig");
 const tracer = @import("tracer.zig");
+const SpanProcessor = @import("span_processor.zig").SpanProcessor;
 
-pub const TracerProvider = struct {
-    res: resource.Resource,
+pub fn TracerProvider(comptime SP: type) type {
+    return struct {
+        res: resource.Resource,
+        processor: SpanProcessor(SP),
 
-    pub fn init(res: resource.Resource) @This() {
-        return @This(){
-            .res = res,
-        };
-    }
+        pub fn init(res: resource.Resource, processor: SpanProcessor(SP)) @This() {
+            return @This(){
+                .res = res,
+                .processor = processor,
+            };
+        }
 
-    pub fn TracerType() type {
-        return tracer.Tracer;
-    }
-};
+        pub fn TracerType() type {
+            return tracer.Tracer;
+        }
+    };
+}

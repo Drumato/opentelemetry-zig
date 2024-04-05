@@ -1,5 +1,6 @@
 const std = @import("std");
 const os = std.os;
+const exporter = @import("otel/exporter.zig");
 const trace = @import("otel/trace.zig");
 const span = @import("otel/span.zig");
 const semconv = @import("otel/semconv.zig");
@@ -16,8 +17,9 @@ pub fn main() !void {
 
     const resource = sdk.Resource.initWithAttributes(semconv.SchemaURL, resource_attrs);
 
-    const sdk_tp = sdk.TracerProvider.init(resource);
-    const tp = trace.TracerProvider(sdk.TracerProvider).init(sdk_tp);
+    const ssp = sdk.SimpleSpanProcessor.init(exporter.HTTPExporter{});
+    const sdk_tp = sdk.TracerProvider(sdk.SimpleSpanProcessor).init(resource, sdk.SpanProcessor(sdk.SimpleSpanProcessor).init(ssp));
+    const tp = trace.TracerProvider(sdk.TracerProvider(sdk.SimpleSpanProcessor)).init(sdk_tp);
 
     var tracer = tp.tracer("otel-zig.main");
 
@@ -45,5 +47,5 @@ fn childFn(
         ctx,
         result,
     );
-    _ = sp;
+    defer sp.end();
 }
