@@ -1,3 +1,4 @@
+const std = @import("std");
 const span = @import("span.zig");
 pub fn TracerProvider(
     comptime TP: type,

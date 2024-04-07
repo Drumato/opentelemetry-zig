@@ -8,6 +8,13 @@ const sdk = @import("otel/sdk.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{ .stack_trace_frames = 0 }){};
+    defer {
+        switch (gpa.deinit()) {
+            .ok => {},
+            .leak => {},
+        }
+    }
+
     const allocator = gpa.allocator();
 
     var resource_attrs = std.StringHashMap([]const u8).init(allocator);
@@ -17,7 +24,7 @@ pub fn main() !void {
 
     const resource = sdk.Resource.initWithAttributes(semconv.SchemaURL, resource_attrs);
 
-    const ssp = sdk.SimpleSpanProcessor.init(exporter.HTTPExporter{});
+    const ssp = sdk.SimpleSpanProcessor.init(exporter.HTTPExporter.init());
     const sdk_tp = sdk.TracerProvider(sdk.SimpleSpanProcessor).init(resource, sdk.SpanProcessor(sdk.SimpleSpanProcessor).init(ssp));
     const tp = trace.TracerProvider(sdk.TracerProvider(sdk.SimpleSpanProcessor)).init(sdk_tp);
 
@@ -48,4 +55,10 @@ fn childFn(
         result,
     );
     defer sp.end();
+}
+
+test "all" {
+    _ = @import("http.zig");
+    _ = @import("map.zig");
+    _ = @import("otel/protobuf.zig");
 }
