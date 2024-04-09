@@ -15,11 +15,6 @@ pub fn SpanProcessor(comptime T: type) type {
             };
         }
 
-        pub fn exportSpans(self: @This(), spans: []otelspan.Span(span.RecordingSpan)) !void {
-            _ = spans;
-            return self.impl.exportSpans();
-        }
-
         pub fn shutdown(self: @This()) !void {
             return self.impl.shutdown();
         }

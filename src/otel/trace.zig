@@ -17,8 +17,7 @@ pub fn TracerProvider(
         }
 
         pub fn tracer(self: @This(), tracerName: []const u8) Tracer(TP.TracerType()) {
-            _ = self;
-            return Tracer(TP.TracerType()).init(TP.TracerType().init(tracerName));
+            return Tracer(TP.TracerType()).init(TP.TracerType().init(tracerName, self.impl));
         }
     };
 }
@@ -39,8 +38,7 @@ pub fn Tracer(comptime T: type) type {
 
         pub fn start(self: @This(), ctx: span.SpanContext, spanName: []const u8) span.Span(T.SpanType()) {
             _ = ctx;
-            _ = self;
-            const s = T.SpanType().init(spanName);
+            const s = T.SpanType().init(spanName, self.impl);
             return span.Span(T.SpanType()).init(s);
         }
     };

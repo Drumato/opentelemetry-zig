@@ -29,6 +29,7 @@ pub const Client = struct {
 };
 
 pub const MethodGET: []const u8 = "GET";
+pub const MethodPOST: []const u8 = "POST";
 
 pub fn Request(comptime T: type) type {
     return struct {

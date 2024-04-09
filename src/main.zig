@@ -23,9 +23,10 @@ pub fn main() !void {
     try resource_attrs.put(semconv.ServiceNameAttrKey, "otel-zig");
 
     const resource = sdk.Resource.initWithAttributes(semconv.SchemaURL, resource_attrs);
-
-    const ssp = sdk.SimpleSpanProcessor.init(exporter.HTTPExporter.init());
+    const http_exporter = exporter.HTTPExporter.init(allocator);
+    const ssp = sdk.SimpleSpanProcessor.init(http_exporter);
     const sdk_tp = sdk.TracerProvider(sdk.SimpleSpanProcessor).init(resource, sdk.SpanProcessor(sdk.SimpleSpanProcessor).init(ssp));
+    defer sdk_tp.shutdown();
     const tp = trace.TracerProvider(sdk.TracerProvider(sdk.SimpleSpanProcessor)).init(sdk_tp);
 
     var tracer = tp.tracer("otel-zig.main");
@@ -45,7 +46,7 @@ pub fn main() !void {
 
 fn childFn(
     ctx: span.SpanContext,
-    tracer: *trace.Tracer(sdk.Tracer),
+    tracer: *trace.Tracer(sdk.Tracer(sdk.SimpleSpanProcessor)),
     i: usize,
 ) !void {
     var span_name: [256]u8 = undefined;

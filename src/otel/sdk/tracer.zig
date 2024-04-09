@@ -1,14 +1,23 @@
 const span = @import("span.zig");
-pub const Tracer = struct {
-    name: []const u8,
+const TracerProvider = @import("provider.zig").TracerProvider;
 
-    pub fn init(name: []const u8) @This() {
-        return @This(){
-            .name = name,
-        };
-    }
+pub fn Tracer(comptime SP: type) type {
+    return struct {
+        name: []const u8,
+        provider: TracerProvider(SP),
 
-    pub fn SpanType() type {
-        return span.RecordingSpan;
-    }
-};
+        pub fn init(
+            name: []const u8,
+            provider: TracerProvider(SP),
+        ) @This() {
+            return @This(){
+                .name = name,
+                .provider = provider,
+            };
+        }
+
+        pub fn SpanType() type {
+            return span.RecordingSpan(SP);
+        }
+    };
+}

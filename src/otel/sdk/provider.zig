@@ -14,8 +14,9 @@ pub fn TracerProvider(comptime SP: type) type {
             };
         }
 
+        pub fn shutdown(_: @This()) void {}
         pub fn TracerType() type {
-            return tracer.Tracer;
+            return tracer.Tracer(SP);
         }
     };
 }
