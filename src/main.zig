@@ -36,11 +36,11 @@ pub fn main() !void {
         var span_name: [256]u8 = undefined;
         const result = try std.fmt.bufPrint(&span_name, "loop-{}", .{i});
         const sp = tracer.start(span_context, result);
-        defer sp.end();
 
         try childFn(span_context, &tracer, i);
 
         std.time.sleep(std.time.ns_per_s);
+        try sp.end();
     }
 }
 
@@ -55,7 +55,7 @@ fn childFn(
         ctx,
         result,
     );
-    defer sp.end();
+    try sp.end();
 }
 
 test "all" {

@@ -1,6 +1,7 @@
 const exporter = @import("../exporter.zig");
 const resource = @import("resource.zig");
 const otelspan = @import("../span.zig");
+const span = @import("span.zig");
 
 pub const SimpleSpanProcessor = struct {
     exporter: exporter.HTTPExporter,
@@ -11,8 +12,10 @@ pub const SimpleSpanProcessor = struct {
         };
     }
 
-    pub fn onEnd(self: @This(), res: *resource.Resource) !void {
-        const spans = [_]otelspan.Span(@This()){self};
-        try self.exporter.exportSpans(res, spans[0..]);
+    pub fn onEnd(self: @This(), res: resource.Resource, sp: span.RecordingSpan(@This())) !void {
+        const spans = [_]otelspan.Span(span.RecordingSpan(@This())){
+            otelspan.Span(span.RecordingSpan(@This())).init(sp),
+        };
+        try self.exporter.exportSpans(res, &spans);
     }
 };

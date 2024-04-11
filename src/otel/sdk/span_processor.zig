@@ -1,5 +1,7 @@
 const otelspan = @import("../span.zig");
 const span = @import("span.zig");
+const SimpleSpanProcessor = @import("simple_span_processor.zig").SimpleSpanProcessor;
+const resource = @import("resource.zig");
 
 pub fn SpanProcessor(comptime T: type) type {
     return struct {
@@ -13,6 +15,14 @@ pub fn SpanProcessor(comptime T: type) type {
             return @This(){
                 .impl = impl,
             };
+        }
+
+        pub fn onEnd(
+            self: @This(),
+            res: resource.Resource,
+            sp: span.RecordingSpan(SimpleSpanProcessor),
+        ) !void {
+            try self.impl.onEnd(res, sp);
         }
 
         pub fn shutdown(self: @This()) !void {

@@ -15,8 +15,8 @@ pub fn RecordingSpan(comptime SP: type) type {
             };
         }
 
-        pub fn end(self: @This()) void {
-            self.tracer.provider.processor.onEnd();
+        pub fn end(self: @This()) !void {
+            try self.tracer.provider.processor.onEnd(self.tracer.provider.res, self);
         }
     };
 }

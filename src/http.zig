@@ -2,11 +2,13 @@ const OrderedStringMap = @import("map.zig").OrderedStringMap;
 const std = @import("std");
 
 pub const Client = struct {
-    server_address: []const u8,
+    server_host: []const u8,
+    server_port: u16,
 
-    pub fn init(sa: []const u8) @This() {
+    pub fn init(host: []const u8, port: u16) @This() {
         return @This(){
-            .server_address = sa,
+            .server_host = host,
+            .server_port = port,
         };
     }
 
@@ -16,15 +18,16 @@ pub const Client = struct {
         allocator: std.mem.Allocator,
         req: Request(T),
     ) !void {
-        const stream = try std.net.tcpConnectToAddress(self.server_address);
+        const server_address = try std.net.Address.parseIp(self.server_host, self.server_port);
+        const stream = try std.net.tcpConnectToAddress(server_address);
         defer stream.close();
 
         var req_buffer = std.ArrayList(u8).init(allocator);
         try req.encode(&req_buffer);
         try stream.writeAll(req_buffer.items);
 
-        var resp_buffer = std.ArrayList(u8).init(allocator);
-        try stream.readAll(&resp_buffer);
+        const resp_buffer = std.ArrayList(u8).init(allocator);
+        _ = try stream.readAll(resp_buffer.items);
     }
 };
 

@@ -12,8 +12,20 @@ pub fn Span(comptime S: type) type {
             };
         }
 
-        pub fn end(self: @This()) void {
-            _ = self;
+        pub fn name(self: @This()) []const u8 {
+            return self.impl.name;
+        }
+
+        pub fn startTimeUnixnano(self: @This()) []const u8 {
+            return self.impl.startTimeUnixNano();
+        }
+
+        pub fn endTimeUnixnano(self: @This()) []const u8 {
+            return self.impl.endTimeUnixNano();
+        }
+
+        pub fn end(self: @This()) !void {
+            return self.impl.end();
         }
     };
 }
