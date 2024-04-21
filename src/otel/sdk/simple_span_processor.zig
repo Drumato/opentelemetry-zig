@@ -12,9 +12,9 @@ pub const SimpleSpanProcessor = struct {
         };
     }
 
-    pub fn onEnd(self: @This(), res: resource.Resource, sp: span.RecordingSpan(@This())) !void {
-        const spans = [_]otelspan.Span(span.RecordingSpan(@This())){
-            otelspan.Span(span.RecordingSpan(@This())).init(sp),
+    pub fn onEnd(self: @This(), res: resource.Resource, sp: *span.RecordingSpan(@This())) !void {
+        const spans = [_]otelspan.Span(*span.RecordingSpan(@This())){
+            otelspan.Span(*span.RecordingSpan(@This())).init(sp),
         };
         try self.exporter.exportSpans(res, &spans);
     }

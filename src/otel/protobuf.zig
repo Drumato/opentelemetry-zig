@@ -1,12 +1,12 @@
 const std = @import("std");
 
 pub const Trace = struct {
-    resource_spans: []const ResourceSpan,
+    resourceSpans: []const ResourceSpan,
 };
 
 pub const ResourceSpan = struct {
     resource: Resource,
-    scope_spans: []const ScopeSpan,
+    scopeSpans: []const ScopeSpan,
 };
 
 pub const Resource = struct {
@@ -19,7 +19,7 @@ pub const Attribute = struct {
 };
 
 pub const AttributeValue = struct {
-    string_value: ?[]const u8,
+    stringValue: ?[]const u8,
 };
 
 pub const ScopeSpan = struct {
@@ -34,12 +34,12 @@ pub const Scope = struct {
 };
 
 pub const Span = struct {
-    trace_id: []const u8,
-    span_id: []const u8,
-    parent_id: []const u8,
+    traceId: []const u8,
+    spanId: []const u8,
+    parentId: []const u8,
     name: []const u8,
-    start_time_unixnano: []const u8,
-    end_time_unixnano: []const u8,
+    startTimeUnixNano: []const u8,
+    endTimeUnixNano: []const u8,
     kind: i8,
     attributes: []const Attribute,
 };

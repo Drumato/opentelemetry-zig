@@ -1,5 +1,6 @@
 const std = @import("std");
 const span = @import("span.zig");
+
 pub fn TracerProvider(
     comptime TP: type,
 ) type {
@@ -36,10 +37,13 @@ pub fn Tracer(comptime T: type) type {
             };
         }
 
-        pub fn start(self: @This(), ctx: span.SpanContext, spanName: []const u8) span.Span(T.SpanType()) {
-            _ = ctx;
-            const s = T.SpanType().init(spanName, self.impl);
-            return span.Span(T.SpanType()).init(s);
+        pub fn start(
+            self: @This(),
+            allocator: std.mem.Allocator,
+            ctx: span.SpanContext,
+            spanName: []const u8,
+        ) !span.Span(T.SpanType()) {
+            return self.impl.start(allocator, ctx, spanName);
         }
     };
 }

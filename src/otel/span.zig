@@ -3,10 +3,6 @@ pub fn Span(comptime S: type) type {
         impl: S,
 
         pub fn init(impl: S) @This() {
-            if (@typeInfo(S) != .Struct) {
-                @compileError("Span instance must be a struct");
-            }
-
             return @This(){
                 .impl = impl,
             };
@@ -17,21 +13,37 @@ pub fn Span(comptime S: type) type {
         }
 
         pub fn startTimeUnixnano(self: @This()) []const u8 {
-            return self.impl.startTimeUnixNano();
+            return self.impl.startTimeUnixnano();
         }
 
         pub fn endTimeUnixnano(self: @This()) []const u8 {
-            return self.impl.endTimeUnixNano();
+            return self.impl.endTimeUnixnano();
         }
 
-        pub fn end(self: @This()) !void {
+        pub fn end(self: *@This()) !void {
             return self.impl.end();
+        }
+        pub fn spanContext(self: @This()) SpanContext {
+            return self.impl.spanContext();
+        }
+
+        pub fn traceID(self: @This()) ![]const u8 {
+            return self.impl.traceIDString();
+        }
+
+        pub fn spanID(self: @This()) ![]const u8 {
+            return self.impl.spanIDString();
         }
     };
 }
 
 pub const SpanContext = struct {
-    pub fn init() @This() {
-        return @This(){};
+    trace_id: u128,
+    span_id: u64,
+    pub fn init(trace_id: u128, span_id: u64) @This() {
+        return @This(){
+            .trace_id = trace_id,
+            .span_id = span_id,
+        };
     }
 };

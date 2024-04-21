@@ -20,7 +20,7 @@ pub fn SpanProcessor(comptime T: type) type {
         pub fn onEnd(
             self: @This(),
             res: resource.Resource,
-            sp: span.RecordingSpan(SimpleSpanProcessor),
+            sp: *span.RecordingSpan(SimpleSpanProcessor),
         ) !void {
             try self.impl.onEnd(res, sp);
         }
