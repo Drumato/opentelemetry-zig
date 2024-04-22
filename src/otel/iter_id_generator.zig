@@ -5,8 +5,8 @@ pub const IterIDGenerator = struct {
 
     pub fn init() @This() {
         return @This(){
-            .next_spanid_value = 0,
-            .next_traceid_value = 0,
+            .next_spanid_value = 1,
+            .next_traceid_value = 1000,
         };
     }
 
@@ -15,6 +15,7 @@ pub const IterIDGenerator = struct {
         self.next_traceid_value += 1;
         return v;
     }
+
     pub fn generateSpanID(self: *@This()) u64 {
         const v = self.next_spanid_value;
         self.next_spanid_value += 1;

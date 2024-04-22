@@ -44,6 +44,15 @@ pub fn RecordingSpan(comptime SP: type) type {
             return span_id;
         }
 
+        pub fn parentIDString(self: @This()) ![]const u8 {
+            if (self.ctx.parent_id == 0) {
+                return "";
+            }
+
+            const parent_id = try std.fmt.allocPrint(self.allocator, "{x:0>16}", .{self.ctx.parent_id});
+            return parent_id;
+        }
+
         pub fn startTimeUnixnano(self: @This()) []const u8 {
             return self.start_time_unixnano;
         }

@@ -36,7 +36,7 @@ pub const Scope = struct {
 pub const Span = struct {
     traceId: []const u8,
     spanId: []const u8,
-    parentId: []const u8,
+    parentSpanId: []const u8,
     name: []const u8,
     startTimeUnixNano: []const u8,
     endTimeUnixNano: []const u8,

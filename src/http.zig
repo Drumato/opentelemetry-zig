@@ -25,15 +25,12 @@ pub const Client = struct {
         var req_buffer = std.ArrayList(u8).init(allocator);
         defer req_buffer.deinit();
         try req.encode(&req_buffer);
-        std.debug.print("request: {s}\n", .{req_buffer.items});
         try stream.writeAll(req_buffer.items);
 
         const resp_buffer = try allocator.alloc(u8, 4096);
-        _ = try stream.readAll(resp_buffer);
+        const n = try stream.read(resp_buffer);
 
-        std.debug.print("received response: {s}\n", .{resp_buffer});
-
-        var resp = try Response.decode(allocator, resp_buffer);
+        var resp = try Response.decode(allocator, resp_buffer[0..n]);
         defer resp.deinit();
 
         std.debug.print("received response: {s} {} {s}\n", .{ resp.http_version, resp.status_code, resp.reason_phrase });
