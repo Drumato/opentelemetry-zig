@@ -2,6 +2,9 @@ pub fn Span(comptime S: type) type {
     return struct {
         impl: S,
 
+        pub fn context(self: @This()) SpanContext {
+            return self.impl.context();
+        }
         pub fn init(impl: S) @This() {
             return @This(){
                 .impl = impl,

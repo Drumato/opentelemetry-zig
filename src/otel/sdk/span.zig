@@ -5,7 +5,7 @@ const Tracer = @import("tracer.zig").Tracer;
 pub fn RecordingSpan(comptime SP: type) type {
     return struct {
         name: []const u8,
-        tracer: Tracer(SP),
+        tracer: *Tracer(SP),
         ctx: span.SpanContext,
         start_time_unixnano: []const u8,
         end_time_unixnano: []const u8,
@@ -14,7 +14,7 @@ pub fn RecordingSpan(comptime SP: type) type {
         pub fn init(
             allocator: std.mem.Allocator,
             name: []const u8,
-            tracer: Tracer(SP),
+            tracer: *Tracer(SP),
             ctx: span.SpanContext,
         ) !@This() {
             const start_time_unixnano = try std.fmt.allocPrint(allocator, "{}", .{std.time.nanoTimestamp()});
@@ -26,6 +26,10 @@ pub fn RecordingSpan(comptime SP: type) type {
                 .start_time_unixnano = start_time_unixnano,
                 .end_time_unixnano = "",
             };
+        }
+
+        pub fn context(self: @This()) span.SpanContext {
+            return self.ctx;
         }
 
         pub fn end(self: *@This()) !void {

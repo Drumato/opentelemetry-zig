@@ -38,9 +38,9 @@ pub fn Tracer(comptime T: type) type {
         }
 
         pub fn start(
-            self: @This(),
+            self: *@This(),
             allocator: std.mem.Allocator,
-            ctx: span.SpanContext,
+            ctx: ?span.SpanContext,
             spanName: []const u8,
         ) !span.Span(T.SpanType()) {
             return self.impl.start(allocator, ctx, spanName);

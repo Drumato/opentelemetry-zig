@@ -23,13 +23,24 @@ pub fn Tracer(comptime SP: type) type {
         }
 
         pub fn start(
-            self: @This(),
+            self: *@This(),
             allocator: std.mem.Allocator,
-            ctx: otelspan.SpanContext,
+            parent_ctx: ?otelspan.SpanContext,
             spanName: []const u8,
         ) !otelspan.Span(span.RecordingSpan(SP)) {
-            const s = try span.RecordingSpan(SP).init(allocator, spanName, self, ctx);
-            return otelspan.Span(span.RecordingSpan(SP)).init(s);
+            if (parent_ctx) |pctx| {
+                const span_id = self.provider.id_generator.generateSpanID();
+                var ctx = otelspan.SpanContext.init(pctx.trace_id, span_id);
+                ctx.setParentID(pctx.span_id);
+                const s = try span.RecordingSpan(SP).init(allocator, spanName, self, ctx);
+                return otelspan.Span(span.RecordingSpan(SP)).init(s);
+            } else {
+                const trace_id = self.provider.id_generator.generateTraceID();
+                const span_id = self.provider.id_generator.generateSpanID();
+                const ctx = otelspan.SpanContext.init(trace_id, span_id);
+                const s = try span.RecordingSpan(SP).init(allocator, spanName, self, ctx);
+                return otelspan.Span(span.RecordingSpan(SP)).init(s);
+            }
         }
     };
 }

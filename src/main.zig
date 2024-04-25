@@ -33,14 +33,11 @@ pub fn main() !void {
 
     for (0..10) |i| {
         std.debug.print("loop {}\n", .{i});
-        const trace_id = sdk_tp.id_generator.generateTraceID();
-        const span_id = sdk_tp.id_generator.generateSpanID();
-        const span_context = span.SpanContext.init(trace_id, span_id);
         const span_name = try std.fmt.allocPrint(allocator, "loop-{}", .{i});
         defer allocator.free(span_name);
-        var sp = try tracer.start(allocator, span_context, span_name);
+        var sp = try tracer.start(allocator, null, span_name);
 
-        try childFn(allocator, span_context, &sdk_tp, &tracer, i);
+        try childFn(allocator, sp.context(), &tracer, i);
 
         std.time.sleep(2 * std.time.ns_per_s);
         try sp.end();
@@ -50,18 +47,14 @@ pub fn main() !void {
 fn childFn(
     allocator: std.mem.Allocator,
     ctx: span.SpanContext,
-    sdk_tp: *sdk.TracerProvider(sdk.SimpleSpanProcessor),
     tracer: *trace.Tracer(sdk.Tracer(sdk.SimpleSpanProcessor)),
     i: usize,
 ) !void {
-    const span_id = sdk_tp.id_generator.generateSpanID();
-    var span_context = span.SpanContext.init(ctx.trace_id, span_id);
-    span_context.setParentID(ctx.span_id);
     const span_name = try std.fmt.allocPrint(allocator, "loop-{}-child", .{i});
     defer allocator.free(span_name);
     var sp = try tracer.start(
         allocator,
-        span_context,
+        ctx,
         span_name,
     );
 
